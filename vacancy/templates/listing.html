@@ -1,0 +1,51 @@
+{% extends 'index.html' %}
+{% load i18n %}
+
+{% block meta_title %}{% trans "Vacancies" %}{% endblock %}
+{% block title %}{% trans "Vacancies" %}{% endblock %}
+
+{% block main %}
+<div class="container center">
+    <h1>Vacant Positions</h1>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered table-hover table-condensed">
+            <thead>
+                <tr>
+                    <th>Position/ Station</th>
+                    <th>SG/ Monthly Salary</th>
+                    <th>Item No.</th>
+                    <th>Education</th>
+                    <th>Work Experience</th>
+                    <th>Training</th>
+                    <th>Eligibility</th>
+                </tr>
+            </thead>    
+            <tbody>
+                {% for vacancy in vacancies %}
+                <tr>
+                    <td>{{ vacancy.position }} - {{ vacancy.station }}</td>
+                    <td>{{ vacancy.position.salary_grade }} - PHP {{ vacancy.position.salary_grade.monthly_salary }}</td>
+                    <td>{{ vacancy.item_number }}</td>
+                    <td>{{ vacancy.qs_education }}</td>
+                    <td>
+                    {% if vacancy.qs_work_experience > 0 %}
+                        {{ vacancy.qs_work_experience }} year{{ vacancy.qs_work_experience|pluralize }} relevant experience
+                    {% else %}
+                        None required
+                    {% endif %}
+                    </td>
+                    <td>
+                    {% if vacancy.qs_training > 0 %}
+                        {{ vacancy.qs_training }} hour{{ vacancy.qs_training|pluralize }} relevant training
+                    {% else %}
+                        None required
+                    {% endif %}
+                    </td>
+                    <td>{{ vacancy.eligibility }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

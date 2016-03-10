@@ -1,0 +1,79 @@
+### Django ###
+*.py[cod]
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+
+# SQLite3 DB #
+*.sqlite3
+*.db
+
+# Logs
+*.log
+pip-log.txt
+
+### OSX ###
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+
+### SublimeText ###
+# workspace files are user-specific
+*.sublime-workspace
+
+# project files should be checked into the repository, unless a significant
+# proportion of contributors will probably not be using SublimeText
+*.sublime-project
+
+#sftp configuration file
+sftp-config.json
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+
+# Translations
+*.mo
+*.pot
+
+# Pycharm
+.idea
+
+# Vim
+
+*~
+*.swp
+*.swo
+
+# npm
+dist
+node_modules
+
+# Campass
+.sass-cache
+
+local.py
+production.py
+
+*.orig

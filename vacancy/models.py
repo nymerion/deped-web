@@ -20,9 +20,22 @@ class Qualification(models.Model):
 
 
 class Position(models.Model):
+    TS = 'TS'
+    NTS = 'NTS'
+    TR = 'TR'
+
+    CATEGORY_CHOICES = (
+        (TS, 'Teaching Staff'),
+        (NTS, 'Non-Teaching Staff'),
+        (TR, 'Teaching-Related'),
+    )
+
     name = models.CharField(max_length=32, unique=True)
     salary_grade = models.ForeignKey(SalaryGrade)
     qualification = models.ManyToManyField(Qualification, through='QualificationValue')
+    category = models.CharField(max_length=8,
+                                choices=CATEGORY_CHOICES,
+                                default=TS)
 
     def __unicode__(self):
         return "%s" % self.name
@@ -40,17 +53,14 @@ class QualificationValue(models.Model):
         (CSC1, 'CSC LVL 1'),
         (CSC2, 'CSC LVL 2'),
     )
-    position = models.ForeignKey(Position, **optional)
-    qualification = models.ForeignKey(Qualification, **optional)
+    position = models.ForeignKey(Position, default=0, related_name='qualification_standards')
+    qualification = models.ForeignKey(Qualification, default=0)
     education = models.CharField(max_length=256)
     work_experience = models.CharField(max_length=256)
     training = models.IntegerField(help_text="Hours of relevant training")
     eligibility = models.CharField(max_length=8,
                                    choices=ELIGIBILITY_CHOICES,
                                    default=LET)
-
-    def __unicode__(self):
-        return "%s" % self.qualification
 
 
 class Item(models.Model):
@@ -68,8 +78,9 @@ class Item(models.Model):
     station_name = models.CharField(max_length=64, **optional)
     station_type = models.CharField(max_length=2,
                                     choices=STATION_CHOICES,
-                                    default=DO)
+                                    default=ES)
     filled = models.BooleanField(default=False)
+    is_new = models.BooleanField(default=True)
 
     def __unicode__(self):
         return "%s" % self.number

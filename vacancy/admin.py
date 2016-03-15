@@ -1,6 +1,5 @@
+import locale
 from django.contrib import admin
-from django import forms
-from django.forms import inlineformset_factory
 
 from vacancy.models import (
     SalaryGrade,
@@ -13,9 +12,16 @@ from vacancy.models import (
     Registry,
 )
 
+locale.setlocale(locale.LC_ALL, 'en_US')
+
 class SalaryGradeAdmin(admin.ModelAdmin):
     model = SalaryGrade
-    list_display = ('salary_grade', 'monthly_salary',)
+    list_display = ('salary_grade', 'get_salary',)
+
+    def get_salary(self, obj):
+        return locale.format("%0.2f", obj.monthly_salary, grouping=True)
+    get_salary.short_description = 'Monthly Salary'
+    get_salary.admin_order_field = 'monthly_salary'
 
 
 class QualificationValueInline(admin.TabularInline):
@@ -28,21 +34,34 @@ class PositionAdmin(admin.ModelAdmin):
     model = Position
     list_display = ('name', 'salary_grade',)
     inlines = [QualificationValueInline,]
+    list_filter = (
+        ('salary_grade', admin.RelatedOnlyFieldListFilter),
+    )
+    search_fields = ('name',)
 
 
 class ItemAdmin(admin.ModelAdmin):
     model = Item
-    list_display = ('number', 'position', 'station_type', 'filled')
+    list_display = ('number', 'position', 'station_type', 'station_name', 'filled')
+    list_filter = (
+        ('position', admin.RelatedOnlyFieldListFilter),
+        ('station_type'),
+        ('station_name'),
+        ('filled'),
+    )
+    search_fields = ('number',)
 
 
 class VacancyAdmin(admin.ModelAdmin):
     model = Vacancy
     list_display = ('pub_date', 'close_date', 'is_open')
+    list_filter = ('is_open', 'pub_date', 'close_date')
 
 
 class PersonAdmin(admin.ModelAdmin):
     model = Person
     list_display = ('last_name', 'first_name', 'address')
+    search_fields = ('last_name', 'first_name', 'address')
 
 
 class RegistryAdmin(admin.ModelAdmin):

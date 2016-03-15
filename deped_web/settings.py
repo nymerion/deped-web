@@ -22,7 +22,7 @@ from django.utils.translation import ugettext_lazy as _
 ADMIN_MENU_ORDER = (
     ("Content", ("pages.Page", "blog.BlogPost",
        "generic.ThreadedComment", (_("Media Library"), "media-library"),)),
-    ("Vacancy", ("vacancy.SalaryGrade", "vacancy.Position", "vacancy.Station", "vacancy.Vacancy")),
+    ("Vacancy", ("vacancy.SalaryGrade", "vacancy.Position", "vacancy.Item", "vacancy.Vacancy", "vacancy.Person", "vacancy.Registry")),
     ("Site", ("sites.Site", "redirects.Redirect", "conf.Setting")),
     ("Users", ("auth.User", "auth.Group",)),
 )

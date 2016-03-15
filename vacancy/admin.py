@@ -1,5 +1,7 @@
 import locale
+from django import forms
 from django.contrib import admin
+from django.contrib.admin.widgets import FilteredSelectMultiple
 
 from vacancy.models import (
     SalaryGrade,
@@ -13,6 +15,7 @@ from vacancy.models import (
 )
 
 locale.setlocale(locale.LC_ALL, 'en_US')
+
 
 class SalaryGradeAdmin(admin.ModelAdmin):
     model = SalaryGrade
@@ -52,10 +55,19 @@ class ItemAdmin(admin.ModelAdmin):
     search_fields = ('number',)
 
 
+class VacancyAdminForm(forms.ModelForm):
+    items = forms.ModelMultipleChoiceField(queryset=Item.objects.all(), widget=FilteredSelectMultiple("Items", is_stacked=False))
+    
+    class Meta:
+        model = Vacancy
+        fields = ['items', 'pub_date', 'close_date', 'is_open']
+
+
 class VacancyAdmin(admin.ModelAdmin):
     model = Vacancy
     list_display = ('pub_date', 'close_date', 'is_open')
     list_filter = ('is_open', 'pub_date', 'close_date')
+    form = VacancyAdminForm
 
 
 class PersonAdmin(admin.ModelAdmin):

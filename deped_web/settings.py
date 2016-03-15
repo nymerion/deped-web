@@ -229,6 +229,8 @@ if DJANGO_VERSION < (1, 9):
 ################
 
 INSTALLED_APPS = (
+    "custom_templates",
+
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -237,6 +239,8 @@ INSTALLED_APPS = (
     "django.contrib.sites",
     "django.contrib.sitemaps",
     "django.contrib.staticfiles",
+
+    # third party
     "mezzanine.boot",
     "mezzanine.conf",
     "mezzanine.core",
@@ -248,6 +252,8 @@ INSTALLED_APPS = (
     "mezzanine.twitter",
     # "mezzanine.accounts",
     # "mezzanine.mobile",
+
+    # local
     "vacancy",
 )
 

@@ -3,7 +3,7 @@ from django.shortcuts import render
 from vacancy.models import Vacancy, Position
 
 
-def listing(request):
+def listing(request, template):
     context = {'vacancies': []}
     vacancies = Vacancy.objects.filter(is_open=True).order_by('pub_date')
 

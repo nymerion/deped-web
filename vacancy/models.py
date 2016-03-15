@@ -54,7 +54,7 @@ class QualificationValue(models.Model):
         (CSC2, 'CSC LVL 2'),
     )
     position = models.ForeignKey(Position, default=0, related_name='qualification_standards')
-    qualification = models.ForeignKey(Qualification, default=0)
+    qualification = models.ForeignKey(Qualification, **optional)
     education = models.CharField(max_length=256)
     work_experience = models.CharField(max_length=256)
     training = models.IntegerField(help_text="Hours of relevant training")

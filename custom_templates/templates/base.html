@@ -88,6 +88,7 @@
 <div class="col-md-12" style="background:#42767b">
     <img src="/static/media/uploads/banner.jpg" class="col-md-12"/>
 </div>
+<h1>{% block title %}{% endblock %}</h1>
 
 <ul class="breadcrumb">
 {% spaceless %}
@@ -100,11 +101,32 @@
 <div class="container">
 <div class="row">
 
-<div class="col-md-12 middle">
-    <h1>{% block title %}{% endblock %}</h1>
-    {% block main %}{% endblock %}
+<div class="col-md-2 left">
+    {% block left_panel %}
+    <div class="panel panel-default tree">{% page_menu "pages/menus/tree.html" %}</div>
+    {% endblock %}
 </div>
 
+<div class="col-md-10 middle">
+    {% block main %}{% endblock %}
+</div>
+{% comment %}
+<div class="col-md-3 right">
+    {% nevercache %}
+    {% include "includes/language_selector.html" %}
+    {% include "includes/user_panel.html" %}
+    {% endnevercache %}
+    <div class="panel panel-default">
+    <div class="panel-body">
+    {% block right_panel %}
+    {% ifinstalled mezzanine.twitter %}
+    {% include "twitter/tweets.html" %}
+    {% endifinstalled %}
+    {% endblock %}
+    </div>
+    </div>
+</div>
+{% endcomment %}
 </div>
 </div>
 

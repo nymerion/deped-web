@@ -91,9 +91,13 @@ USE_MODELTRANSLATION = False
 # MAIN DJANGO SETTINGS #
 ########################
 
+# Make these unique, and don't share it with anybody.
+SECRET_KEY = "_aoat5-uai7c9h_gya9d1+=z^^h=an2bb&^dq9zw4aq8knfmf0"
+NEVERCACHE_KEY = "!@)5r6doh_+p(l@ht4tll2spi@(x2z71ltlz&9+b0(2l8*9nzy"
+
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['depedigacos.pythonanywhere.com',]
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name

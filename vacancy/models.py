@@ -46,12 +46,14 @@ class QualificationValue(models.Model):
     PD = 'PD907'
     CSC1 = 'CSC1'
     CSC2 = 'CSC2'
+    CESO = 'CESO'
 
     ELIGIBILITY_CHOICES = (
         (LET, 'LET/PBET'),
         (PD, 'PD 907'),
         (CSC1, 'CSC LVL 1'),
         (CSC2, 'CSC LVL 2'),
+        (CESO, 'CESO'),
     )
     position = models.ForeignKey(Position, default=0, related_name='qualification_standards')
     qualification = models.ForeignKey(Qualification, **optional)
@@ -61,16 +63,22 @@ class QualificationValue(models.Model):
     eligibility = models.CharField(max_length=8,
                                    choices=ELIGIBILITY_CHOICES,
                                    default=LET)
+    notes = models.CharField(max_length=256, **optional)
 
 
 class Item(models.Model):
     ES = 'ES'
     HS = 'HS'
-    DO = 'DO'
+    SDS = 'SDS'
+    CID = 'CID'
+    SGOD = 'SGOD'
+
     STATION_CHOICES = (
         (ES, 'Elementary'),
         (HS, 'High School'),
-        (DO, 'Division Office')
+        (SDS, 'Office of the Schools Division Superintendent'),
+        (CID, 'Curriculum Implementation Division'),
+        (SGOD, 'School Governance and Operations Division'),
     )
 
     number = models.CharField(max_length=32, unique=True)
@@ -80,7 +88,7 @@ class Item(models.Model):
                                     choices=STATION_CHOICES,
                                     default=ES)
     filled = models.BooleanField(default=False)
-    is_new = models.BooleanField(default=True)
+    is_new = models.BooleanField("Newly created item", default=True)
 
     def __unicode__(self):
         return "%s" % self.number

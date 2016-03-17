@@ -5,11 +5,11 @@
 {% block title %}{% trans "Vacancies" %}{% endblock %}
 
 {% block main %}
-<div class="container center">
+<div class="container">
     {% for vacancy in vacancies %}
     <h5>Published {{ vacancy.pub_date }}</h5>
     <div class="table-responsive">
-        <table class="table table-bordered table-condensed">
+        <table class="table table-bordered table-condensed row">
             <thead>
                 <tr>
                     <th rowspan="2" class="col-md-1">Position/ Station</th>
@@ -59,7 +59,13 @@
                             None required
                         {% endif %}
                     </td>
-                    <td>{{ qualification.eligibility }}</td>
+                    <td>
+                        {{ qualification.eligibility }}
+                        {% if qualification.notes %}
+                            <br/><br/>
+                            {{ qualification.notes }}
+                        {% endif %}
+                    </td>
                 </tr>
                 {% empty %}
                     <td>&nbsp;</td>

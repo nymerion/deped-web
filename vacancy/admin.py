@@ -29,7 +29,7 @@ class SalaryGradeAdmin(admin.ModelAdmin):
 
 class QualificationValueInline(admin.TabularInline):
     model = QualificationValue
-    fields = ('education','work_experience','training','eligibility')
+    fields = ('education','work_experience','training','eligibility','notes')
     extra = 2
 
 

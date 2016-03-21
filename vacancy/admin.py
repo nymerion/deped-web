@@ -3,6 +3,8 @@ from django import forms
 from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple
 
+from mezzanine.pages.admin import PageAdmin, PageAdminForm
+
 from vacancy.models import (
     SalaryGrade,
     Qualification,
@@ -55,7 +57,7 @@ class ItemAdmin(admin.ModelAdmin):
     search_fields = ('number',)
 
 
-class VacancyAdminForm(forms.ModelForm):
+class VacancyAdminForm(PageAdminForm):
     items = forms.ModelMultipleChoiceField(queryset=Item.objects.all(), widget=FilteredSelectMultiple("Items", is_stacked=False))
     
     class Meta:

@@ -1,8 +1,9 @@
 from __future__ import unicode_literals
-
 from django.db import models
+from mezzanine.pages.models import Page
 
 optional = {'blank':True, 'null':True}
+
 
 class SalaryGrade(models.Model):
     salary_grade = models.IntegerField(unique=True)
@@ -94,7 +95,7 @@ class Item(models.Model):
         return "%s" % self.number
 
 
-class Vacancy(models.Model):
+class Vacancy(Page):
     items = models.ManyToManyField(Item)
     pub_date = models.DateField(**optional)
     close_date = models.DateField(**optional)
@@ -106,6 +107,39 @@ class Vacancy(models.Model):
 
     def __unicode__(self):
         return "%s - %s" % (self.pub_date, self.close_date)
+
+    def save(self, *args, **kwargs):
+        """
+        Add title, slug and ordering to the Page object
+        """
+        self.title = self.pub_date.strftime("%B %d, %Y")
+        self.slug = ''
+        if self.id is None:
+            try:
+                page = Page.objects.get(slug='vacancy')
+                self.parent = page
+
+                idx = 0
+                done = False
+                for vacancy in Vacancy.objects.filter(parent=page).order_by('-pub_date'):
+                    if self.pub_date > vacancy.pub_date and not done:
+                        self._order = idx
+                        done = True
+                        idx += 1
+                    if idx != vacancy._order:
+                        vacancy._order = idx
+                        vacancy.save()
+                    idx += 1
+            except:
+                pass
+        parent = self.parent
+        while parent:
+            self.slug += parent.slug
+            if parent.slug[-1] != '/':
+                self.slug += '/'
+            parent = parent.parent
+        self.slug += "%s" % self.pub_date.strftime('%Y-%m-%d')
+        super(Vacancy, self).save(*args, **kwargs)
 
 
 class Person(models.Model):

@@ -1,41 +1,22 @@
-from django.db.models import Count
-from django.shortcuts import render
-from vacancy.models import Vacancy, Position
+import datetime
+from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect
+from vacancy.models import Vacancy
+from vacancy.utils import generate_vacancy_context
 
 
-def listing(request, template):
+def listing(request, year, month, day, template):
     context = {'vacancies': []}
-    vacancies = Vacancy.objects.filter(is_open=True).order_by('pub_date')
+    date = datetime.datetime(int(year), int(month), int(day))
+    vacancies = Vacancy.objects.filter(is_open=True, pub_date=date).order_by('-pub_date')
 
     for vacancy in vacancies:
-        vc = {
-            'pub_date': vacancy.pub_date,
-            'positions': []
-        }
-        positions = vacancy.items.filter(filled=False).order_by('-position').values('position').annotate(count=Count('position'))
+        generate_vacancy_context(vacancy, context)
 
-        # group by positions
-        for pd in positions:
-            position = Position.objects.get(pk=pd['position'])
-            station_types = vacancy.items.filter(position=position).values('station_type').annotate(count=Count('station_type'))
+    return render(request, template, context)
 
-            # group by station type
-            for st in station_types:
-                stations = vacancy.items.filter(position=position, station_type=st['station_type']).values('station_name').annotate(count=Count('station_name'))
-                
-                # group by station name
-                for station in stations:
-                    items = vacancy.items.filter(position=position, station_type=st['station_type'], station_name=station['station_name']).order_by('number')
-                    vc['positions'].append({  'name': position.name,
-                            'station_type': 'High School' if st['station_type']=='HS' else ('Elementary' if st['station_type']=='ES' else 'Division Office'),
-                            'station_name': station['station_name'],
-                            'salary_grade': position.salary_grade,
-                            'qualifications': position.qualification_standards.all(),
-                            'qs_count': len(position.qualification_standards.all()),
-                            'items': items,
-                            'count': len(items),
-                    })
 
-        context['vacancies'].append(vc)
-
-    return render(request, 'listing.html', context)
+def latest(request, template):
+    vacancy = Vacancy.objects.filter(is_open=True).order_by('-pub_date')[0]
+    url = '/vacancy/%d-%.2d-%.2d/' % (vacancy.pub_date.year, vacancy.pub_date.month, vacancy.pub_date.day)
+    return HttpResponseRedirect(url)

@@ -62,13 +62,13 @@ class VacancyAdminForm(PageAdminForm):
     
     class Meta:
         model = Vacancy
-        fields = ['items', 'pub_date', 'close_date', 'is_open']
+        fields = ['items', 'publish_date', 'expiry_date', 'is_open']
 
 
 class VacancyAdmin(admin.ModelAdmin):
     model = Vacancy
-    list_display = ('pub_date', 'close_date', 'is_open')
-    list_filter = ('is_open', 'pub_date', 'close_date')
+    list_display = ('publish_date', 'expiry_date', 'is_open')
+    list_filter = ('is_open', 'publish_date', 'expiry_date')
     form = VacancyAdminForm
 
 

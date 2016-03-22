@@ -97,8 +97,6 @@ class Item(models.Model):
 
 class Vacancy(Page):
     items = models.ManyToManyField(Item)
-    pub_date = models.DateField(**optional)
-    close_date = models.DateField(**optional)
     is_open = models.BooleanField(default=True)
 
     class Meta:
@@ -106,13 +104,13 @@ class Vacancy(Page):
         verbose_name_plural = "Vacancies"
 
     def __unicode__(self):
-        return "%s - %s" % (self.pub_date, self.close_date)
+        return "%s - %s" % (self.publish_date, self.expiry_date)
 
     def save(self, *args, **kwargs):
         """
         Add title, slug and ordering to the Page object
         """
-        self.title = self.pub_date.strftime("%B %d, %Y")
+        self.title = self.publish_date.strftime("%B %d, %Y")
         self.slug = ''
         if self.id is None:
             try:
@@ -121,8 +119,8 @@ class Vacancy(Page):
 
                 idx = 0
                 done = False
-                for vacancy in Vacancy.objects.filter(parent=page).order_by('-pub_date'):
-                    if self.pub_date > vacancy.pub_date and not done:
+                for vacancy in Vacancy.objects.filter(parent=page).order_by('-publish_date'):
+                    if self.publish_date > vacancy.publish_date and not done:
                         self._order = idx
                         done = True
                         idx += 1
@@ -138,7 +136,7 @@ class Vacancy(Page):
             if parent.slug[-1] != '/':
                 self.slug += '/'
             parent = parent.parent
-        self.slug += "%s" % self.pub_date.strftime('%Y-%m-%d')
+        self.slug += "%s" % self.publish_date.strftime('%Y-%m-%d')
         super(Vacancy, self).save(*args, **kwargs)
 
 

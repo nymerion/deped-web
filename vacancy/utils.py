@@ -4,7 +4,7 @@ from vacancy.models import Position
 
 def generate_vacancy_context(vacancy, context):
     vc = {
-        'pub_date': vacancy.pub_date,
+        'publish_date': vacancy.publish_date,
         'positions': []
     }
     positions = vacancy.items.filter(filled=False).order_by('-position').values('position').annotate(count=Count('position'))

@@ -3,17 +3,19 @@ from django import forms
 from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple
 
-from mezzanine.pages.admin import PageAdmin, PageAdminForm
+from mezzanine.pages.admin import PageAdminForm
+from ajax_select import make_ajax_form
 
 from vacancy.models import (
     SalaryGrade,
-    Qualification,
     QualificationValue,
     Position,
     Item,
     Vacancy,
     Person,
     Registry,
+    Appointment,
+    SchoolYear,
 )
 
 locale.setlocale(locale.LC_ALL, 'en_US')
@@ -80,7 +82,14 @@ class PersonAdmin(admin.ModelAdmin):
 
 class RegistryAdmin(admin.ModelAdmin):
     model = Registry
-    list_display = ('person', 'score')
+    list_display = ('person', 'points')
+
+
+class AppointmentAdmin(admin.ModelAdmin):
+    model = Appointment
+    form = make_ajax_form(Appointment, {
+        'appointee': 'persons',
+    })
 
 
 admin.site.register(SalaryGrade, SalaryGradeAdmin)
@@ -89,3 +98,5 @@ admin.site.register(Item, ItemAdmin)
 admin.site.register(Vacancy, VacancyAdmin)
 admin.site.register(Person, PersonAdmin)
 admin.site.register(Registry, RegistryAdmin)
+admin.site.register(Appointment, AppointmentAdmin)
+admin.site.register(SchoolYear)

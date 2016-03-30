@@ -254,6 +254,7 @@ INSTALLED_APPS = (
     "mezzanine.forms",
     "mezzanine.galleries",
     "mezzanine.twitter",
+    'ajax_select',
     # "mezzanine.accounts",
     # "mezzanine.mobile",
 

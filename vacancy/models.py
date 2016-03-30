@@ -1,5 +1,8 @@
 from __future__ import unicode_literals
+
+from django.core.validators import RegexValidator
 from django.db import models
+
 from mezzanine.pages.models import Page
 
 optional = {'blank':True, 'null':True}
@@ -141,18 +144,69 @@ class Vacancy(Page):
 
 
 class Person(models.Model):
+    MALE = 'M'
+    FEMALE = 'F'
+    MARRIED = 'M'
+    SINGLE = 'S'
+
+    GENDER_CHOICES = (
+        (MALE, 'Male'),
+        (FEMALE, 'Female'),
+    )
+    MARITAL_CHOICES = (
+        (SINGLE, 'Single'),
+        (MARRIED, 'Married'),
+    )
+
+    phone_regex = RegexValidator(regex=r'^\+?1?\d{11,12}$', message="Phone number must be entered in the format: '+639191234567'. Up to 12 digits allowed.")
+
     employee_id = models.CharField(max_length=64, **optional)
-    first_name = models.CharField(max_length=32)
-    last_name = models.CharField(max_length=32)
-    address = models.CharField(max_length=256)
+    first_name = models.CharField(max_length=128)
+    last_name = models.CharField(max_length=128)
+    name_ext = models.CharField(max_length=32, **optional)
+    address = models.CharField(max_length=256, **optional)
+    gender = models.CharField(max_length=1,
+                              choices=GENDER_CHOICES,
+                              default=MALE)
+    marital_status = models.CharField(max_length=1,
+                              choices=MARITAL_CHOICES,
+                              default=SINGLE)
+    phone_number = models.CharField(max_length=16, validators=[phone_regex], **optional)
+    email_address = models.EmailField(**optional)
 
     def __unicode__(self):
         return "%s, %s" % (self.last_name, self.first_name)
 
 
 class Registry(models.Model):
+    ES = 'ES'
+    HS = 'HS'
+
+    SCHOOL_CHOICES = (
+        (ES, 'Elementary'),
+        (HS, 'High School'),
+    )
+
+    ENG = 'ENG'
+    MTH = 'MTH'
+    SCI = 'SCI'
+    FIL = 'FIL'
+
+    SUBJECTS = (
+        (ENG, 'English'),
+        (SCI, 'Science'),
+        (MTH, 'Mathematics'),
+        (FIL, 'Filipino'),
+    )
+    
     person = models.OneToOneField(Person)
-    score = models.IntegerField(default=0)
+    points = models.IntegerField(default=0)
+    school = models.CharField(max_length=2,
+                              choices=SCHOOL_CHOICES,
+                              default=ES)
+    core_subject = models.CharField(max_length=3,
+                                    choices=SUBJECTS,
+                                    default=ENG)
 
     class Meta:
         verbose_name = "RQA Entry"
@@ -162,9 +216,49 @@ class Registry(models.Model):
         return "%s" % self.person
 
 
-class ItemHistory(models.Model):
+class Appointment(models.Model):
+    ORG = 'ORG'
+    PRM = 'PRM'
+    TRN = 'TRN'
+    REM = 'REM'
+    REA = 'REA'
+    REC = 'REC'
+    DEM = 'DEM'
+    NATURE_CHOICES = (
+        (ORG, 'Original'),
+        (PRM, 'Promotion'),
+        (TRN, 'Transfer'),
+        (REM, 'Re-employment'),
+        (REA, 'Reappointment'),
+        (REC, 'Reclassification'),
+        (DEM, 'Demotion'),
+    )
+
+    PMT = 'PMT'
+    SUB = 'SUB'
+    STATUS_CHOICES = (
+        (PMT, 'Permanent'),
+        (SUB, 'Substitute'),
+    )
+
     item = models.ForeignKey(Item)
     appointee = models.ForeignKey(Person, related_name='+')
-    incumbent = models.ForeignKey(Person, related_name='+')
-    start_date = models.DateField(**optional)
+    date_appointed = models.DateField()
+    nature = models.CharField(max_length=3,
+                              choices=NATURE_CHOICES,
+                              default=ORG)
+    status = models.CharField(max_length=3,
+                              choices=STATUS_CHOICES,
+                              default=PMT)
     end_date = models.DateField(**optional)
+
+    def __unicode__(self):
+        return "%s - %s" % (self.appointee, self.item.position)
+
+
+class SchoolYear(models.Model):
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+    def __unicode__(self):
+        return "%s - %s" % (self.start_date.year, self.end_date.year)

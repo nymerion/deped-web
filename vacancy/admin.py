@@ -87,9 +87,33 @@ class RegistryAdmin(admin.ModelAdmin):
 
 class AppointmentAdmin(admin.ModelAdmin):
     model = Appointment
+    list_display = ('appointee', 'item', 'get_position', 'nature', 'date_appointed', 'end_date')
+    list_filter = (
+        ('nature'),
+        ('date_appointed'),
+        ('end_date'),
+    )
+    search_fields = ('appointee__last_name', 'appointee__first_name', 'item__number', 'item__position__name')
     form = make_ajax_form(Appointment, {
         'appointee': 'persons',
     })
+
+    def get_position(self, obj):
+        return obj.item.position
+    get_position.short_description = 'Position'
+    get_position.admin_order_field = 'item__position__salary_grade'
+
+
+class SchoolYearAdminForm(PageAdminForm):
+    class Meta:
+        model = SchoolYear
+        fields = ['start_date', 'end_date']
+
+
+class SchoolYearAdmin(admin.ModelAdmin):
+    model = SchoolYear
+    list_filter = ('start_date', 'end_date')
+    form = SchoolYearAdminForm
 
 
 admin.site.register(SalaryGrade, SalaryGradeAdmin)
@@ -99,4 +123,4 @@ admin.site.register(Vacancy, VacancyAdmin)
 admin.site.register(Person, PersonAdmin)
 admin.site.register(Registry, RegistryAdmin)
 admin.site.register(Appointment, AppointmentAdmin)
-admin.site.register(SchoolYear)
+admin.site.register(SchoolYear, SchoolYearAdmin)

@@ -256,9 +256,43 @@ class Appointment(models.Model):
         return "%s - %s" % (self.appointee, self.item.position)
 
 
-class SchoolYear(models.Model):
+class SchoolYear(Page):
     start_date = models.DateField()
     end_date = models.DateField()
 
     def __unicode__(self):
         return "%s - %s" % (self.start_date.year, self.end_date.year)
+
+    def save(self, *args, **kwargs):
+        """
+        Add title, slug and ordering to the Page object
+        """
+        self.title = "%d-%d" % (self.start_date.year, self.end_date.year)
+        self.slug = ''
+        self.publish_date = self.start_date
+        if self.id is None:
+            try:
+                page = Page.objects.get(slug='noa')
+                self.parent = page
+
+                idx = 0
+                done = False
+                for school_year in SchoolYear.objects.filter(parent=page).order_by('-start_date'):
+                    if self.publish_date > school_year.start_date and not done:
+                        self._order = idx
+                        done = True
+                        idx += 1
+                    if idx != school_year._order:
+                        school_year._order = idx
+                        school_year.save()
+                    idx += 1
+            except:
+                pass
+        parent = self.parent
+        while parent:
+            self.slug += parent.slug
+            if parent.slug[-1] != '/':
+                self.slug += '/'
+            parent = parent.parent
+        self.slug += "%s" % self.title
+        super(SchoolYear, self).save(*args, **kwargs)

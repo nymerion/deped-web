@@ -92,8 +92,8 @@ USE_MODELTRANSLATION = False
 ########################
 
 # Make these unique, and don't share it with anybody.
-SECRET_KEY = "_aoat5-uai7c9h_gya9d1+=z^^h=an2bb&^dq9zw4aq8knfmf0"
-NEVERCACHE_KEY = "!@)5r6doh_+p(l@ht4tll2spi@(x2z71ltlz&9+b0(2l8*9nzy"
+SECRET_KEY = ""
+NEVERCACHE_KEY = ""
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
@@ -184,8 +184,8 @@ ROOT_URLCONF = "%s.urls" % PROJECT_APP
 DATABASES = {
     "default": {
         # Add "postgresql_psycopg2", "mysql", "sqlite3" or "oracle".
-        "ENGINE": 'django.db.backends.sqlite3',
-        "NAME": os.path.join(BASE_DIR, 'db.sqlite3'),
+        "ENGINE": 'django.db.backends.postgresql_psycopg2',
+        "NAME": 'depedigacos',
         # Not used with sqlite3.
         "USER": "",
         # Not used with sqlite3.

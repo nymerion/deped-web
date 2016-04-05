@@ -18,7 +18,7 @@ from vacancy.models import (
     SchoolYear,
 )
 
-locale.setlocale(locale.LC_ALL, 'en_US')
+#locale.setlocale(locale.LC_ALL, 'en_US')
 
 
 class SalaryGradeAdmin(admin.ModelAdmin):
@@ -26,7 +26,7 @@ class SalaryGradeAdmin(admin.ModelAdmin):
     list_display = ('salary_grade', 'get_salary',)
 
     def get_salary(self, obj):
-        return locale.format("%0.2f", obj.monthly_salary, grouping=True)
+        return "%0.2f" % obj.monthly_salary #locale.format("%0.2f", obj.monthly_salary, grouping=True)
     get_salary.short_description = 'Monthly Salary'
     get_salary.admin_order_field = 'monthly_salary'
 

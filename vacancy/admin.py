@@ -8,6 +8,7 @@ from ajax_select import make_ajax_form
 
 from vacancy.models import (
     SalaryGrade,
+    TrancheSalary,
     QualificationValue,
     Position,
     Item,
@@ -20,15 +21,36 @@ from vacancy.models import (
 
 #locale.setlocale(locale.LC_ALL, 'en_US')
 
+class TrancheSalaryInline(admin.TabularInline):
+    model = TrancheSalary
+    fields = ('tranche_no', 'year', 'salary')
+    extra = 4
+
 
 class SalaryGradeAdmin(admin.ModelAdmin):
     model = SalaryGrade
-    list_display = ('salary_grade', 'get_salary',)
+    list_display = ('salary_grade', 'get_tranche_1', 'get_tranche_2', 'get_tranche_3', 'get_tranche_4')
+    inlines = [TrancheSalaryInline,]
 
-    def get_salary(self, obj):
-        return "%0.2f" % obj.monthly_salary #locale.format("%0.2f", obj.monthly_salary, grouping=True)
-    get_salary.short_description = 'Monthly Salary'
-    get_salary.admin_order_field = 'monthly_salary'
+    def get_tranche_1(self, obj):
+        return "%0.2f" % obj.tranche_salary.get(tranche_no=1).salary
+    get_tranche_1.short_description = 'Tranche 1'
+    get_tranche_1.admin_order_field = 'salary_grade'
+
+    def get_tranche_2(self, obj):
+        return "%0.2f" % obj.tranche_salary.get(tranche_no=2).salary
+    get_tranche_2.short_description = 'Tranche 2'
+    get_tranche_2.admin_order_field = 'salary_grade'
+
+    def get_tranche_3(self, obj):
+        return "%0.2f" % obj.tranche_salary.get(tranche_no=3).salary
+    get_tranche_3.short_description = 'Tranche 3'
+    get_tranche_3.admin_order_field = 'salary_grade'
+
+    def get_tranche_4(self, obj):
+        return "%0.2f" % obj.tranche_salary.get(tranche_no=4).salary
+    get_tranche_4.short_description = 'Tranche 4'
+    get_tranche_4.admin_order_field = 'salary_grade'
 
 
 class QualificationValueInline(admin.TabularInline):
@@ -74,15 +96,33 @@ class VacancyAdmin(admin.ModelAdmin):
     form = VacancyAdminForm
 
 
+class PersonAdminForm(forms.ModelForm):
+    class Meta:
+        model = Person
+        fields = ['employee_id','first_name','last_name','name_ext','address','gender','marital_status','phone_number','email_address']
+
+    def clean_email_address(self):
+        return self.cleaned_data['email_address'] or None
+
+    def clean_phone_number(self):
+        return self.cleaned_data['phone_number'] or None
+
+
 class PersonAdmin(admin.ModelAdmin):
     model = Person
     list_display = ('last_name', 'first_name', 'address')
     search_fields = ('last_name', 'first_name', 'address')
+    form = PersonAdminForm
 
 
 class RegistryAdmin(admin.ModelAdmin):
     model = Registry
-    list_display = ('person', 'points')
+    list_display = ('person', 'points', 'school', 'core_subject')
+    list_filter = ('points', 'school', 'core_subject')
+    search_fields = ('person__last_name', 'person__first_name')
+    form = make_ajax_form(Registry, {
+        'person': 'persons',
+    })
 
 
 class AppointmentAdmin(admin.ModelAdmin):

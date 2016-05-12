@@ -25,6 +25,7 @@ def generate_vacancy_context(vacancy, context):
                         'station_type': 'High School' if st['station_type']=='HS' else ('Elementary' if st['station_type']=='ES' else 'Division Office'),
                         'station_name': station['station_name'],
                         'salary_grade': position.salary_grade,
+                        'salary': position.get_salary_for_year(vacancy.publish_date.year),
                         'qualifications': position.qualification_standards.all(),
                         'qs_count': len(position.qualification_standards.all()),
                         'items': items,

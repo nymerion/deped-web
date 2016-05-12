@@ -1,8 +1,10 @@
 from __future__ import unicode_literals
+from datetime import datetime
 
 from django.core.validators import RegexValidator
 from django.db import models
 
+from mezzanine.core.fields import RichTextField
 from mezzanine.pages.models import Page
 
 optional = {'blank':True, 'null':True}
@@ -10,10 +12,34 @@ optional = {'blank':True, 'null':True}
 
 class SalaryGrade(models.Model):
     salary_grade = models.IntegerField(unique=True)
-    monthly_salary = models.DecimalField(max_digits=8, decimal_places=2)
 
     def __unicode__(self):
         return "SG %d" % self.salary_grade
+
+    def get_default_salary(self):
+        now = datetime.now()
+        return self.tranche_salary.get(year=now.year).salary
+
+    def get_salary_for_year(self, year):
+        return self.tranche_salary.get(year=year).salary
+
+
+class Tranche(models.Model):
+    name = models.IntegerField()
+
+
+class TrancheSalary(models.Model):
+    salary_grade = models.ForeignKey(SalaryGrade, related_name='tranche_salary')
+    tranche = models.ForeignKey(Tranche, **optional)
+    tranche_no = models.IntegerField()
+    year = models.IntegerField()
+    salary = models.DecimalField(max_digits=8, decimal_places=2)
+
+    class Meta:
+        unique_together = ('salary_grade', 'year',)
+
+    def __unicode__(self):
+        return "SG %d Tranche %d" % (self.salary_grade.salary_grade, self.tranche_no)
 
 
 class Qualification(models.Model):
@@ -44,9 +70,16 @@ class Position(models.Model):
     def __unicode__(self):
         return "%s" % self.name
 
+    def get_default_salary(self):
+        return self.salary_grade.get_default_salary();
+
+    def get_salary_for_year(self, year):
+        return self.salary_grade.get_salary_for_year(year);
+
 
 class QualificationValue(models.Model):
     LET = 'LET/PBET'
+    RA1080 = 'RA1080'
     PD = 'PD907'
     CSC1 = 'CSC1'
     CSC2 = 'CSC2'
@@ -54,6 +87,7 @@ class QualificationValue(models.Model):
 
     ELIGIBILITY_CHOICES = (
         (LET, 'LET/PBET'),
+        (RA1080, 'RA 1080'),
         (PD, 'PD 907'),
         (CSC1, 'CSC LVL 1'),
         (CSC2, 'CSC LVL 2'),
@@ -61,13 +95,13 @@ class QualificationValue(models.Model):
     )
     position = models.ForeignKey(Position, default=0, related_name='qualification_standards')
     qualification = models.ForeignKey(Qualification, **optional)
-    education = models.CharField(max_length=256)
-    work_experience = models.CharField(max_length=256)
-    training = models.IntegerField(help_text="Hours of relevant training")
+    education = RichTextField(max_length=512)
+    work_experience = RichTextField(max_length=512)
+    training = RichTextField(max_length=512, help_text="Relevant training")
     eligibility = models.CharField(max_length=8,
                                    choices=ELIGIBILITY_CHOICES,
-                                   default=LET)
-    notes = models.CharField(max_length=256, **optional)
+                                   default=LET, **optional)
+    notes = RichTextField(max_length=256, **optional)
 
 
 class Item(models.Model):
@@ -171,11 +205,19 @@ class Person(models.Model):
     marital_status = models.CharField(max_length=1,
                               choices=MARITAL_CHOICES,
                               default=SINGLE)
-    phone_number = models.CharField(max_length=16, validators=[phone_regex], **optional)
-    email_address = models.EmailField(**optional)
+    phone_number = models.CharField(max_length=16, unique=True, validators=[phone_regex], **optional)
+    email_address = models.EmailField(unique=True, **optional)
+
+    def fullname(self):
+        if (self.name_ext):
+            return "%s %s, %s" % (self.first_name, self.last_name, self.name_ext)
+        return "%s %s" % (self.first_name, self.last_name)
 
     def __unicode__(self):
-        return "%s, %s" % (self.last_name, self.first_name)
+        return self.fullname()
+
+    class Meta:
+        unique_together = ('first_name', 'last_name', 'name_ext')
 
 
 class Registry(models.Model):
@@ -199,8 +241,9 @@ class Registry(models.Model):
         (FIL, 'Filipino'),
     )
     
-    person = models.OneToOneField(Person)
-    points = models.IntegerField(default=0)
+    person = models.ForeignKey(Person, related_name='+')
+    points = models.DecimalField(default=0, max_digits=5, decimal_places=2)
+    school_year = models.ForeignKey('SchoolYear')
     school = models.CharField(max_length=2,
                               choices=SCHOOL_CHOICES,
                               default=ES)
@@ -211,6 +254,7 @@ class Registry(models.Model):
     class Meta:
         verbose_name = "RQA Entry"
         verbose_name_plural = "RQA Entries"
+        unique_together = ('person', 'school_year')
 
     def __unicode__(self):
         return "%s" % self.person

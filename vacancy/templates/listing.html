@@ -38,7 +38,7 @@
                     </td>
                     <td rowspan="{{ position.qs_count }}">
                         {{ position.salary_grade }}<br/>
-                        PHP {{ position.salary_grade.monthly_salary }}
+                        PHP {{ position.salary }}
                     </td>
                     <td rowspan="{{ position.qs_count }}">
                 {% for item in position.items %}
@@ -49,22 +49,30 @@
                     {% if not forloop.first %}
                 <tr>
                     {% endif %}
+                    {% autoescape off %}
                     <td>{{ qualification.education }}</td>
                     <td>{{ qualification.work_experience }}</td>
                     <td>
-                        {% if vacancy.qs_training > 0 %}
-                            {{ vacancy.qs_training }} hour{{ vacancy.qs_training|pluralize }} relevant training
+                        {% if qualification.training %}
+                            {{ qualification.training }}
                         {% else %}
                             None required
                         {% endif %}
                     </td>
                     <td>
-                        {{ qualification.eligibility }}
+                        {% if qualification.eligibility %}
+                            {{ qualification.eligibility }}
+
+                            {% if qualification.notes %}
+                                <br/><br/>
+                            {% endif %}
+                        {% endif %}
                         {% if qualification.notes %}
-                            <br/><br/>
                             {{ qualification.notes }}
                         {% endif %}
                     </td>
+                    {% endautoescape %}
+
                 </tr>
                 {% empty %}
                     <td>&nbsp;</td>
